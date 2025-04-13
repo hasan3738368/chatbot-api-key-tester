@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple and user-friendly tool to test your Chatbot API keys with support for multiple endpoints and models.">
+    <title>Chatbot API Key Tester - Test Your API Easily</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/svgs/solid/robot.svg">
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --success-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --info-color: #3B82F6;
+            --light-bg: #F9FAFB;
+            --light-card: #FFFFFF;
+            --light-text: #1F2937;
+            --light-border: #E5E7EB;
+            --dark-bg: #111827;
+            --dark-card: #1F2937;
+            --dark-text: #F9FAFB;
+            --dark-border: #374151;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .light {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+        }
+
+        .dark {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        .light .card {
+            background-color: var(--light-card);
+            border-color: var(--light-border);
+        }
+
+        .dark .card {
+            background-color: var(--dark-card);
+            border-color: var(--dark-border);
+        }
+
+        .card {
+            transition: background-color 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .input-field {
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .dark .input-field {
+            background-color: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+
+        .light .input-field {
+            background-color: var(--light-card);
+            border-color: var(--light-border);
+            color: var(--light-text);
+        }
+
+        .chat-bubble-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 18px 18px 0 18px;
+        }
+
+        .chat-bubble-ai {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #1a202c;
+            border-radius: 18px 18px 18px 0;
+        }
+
+        .dark .chat-bubble-ai {
+            color: #1a202c;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E0;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4A5568;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A0AEC0;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+
+        /* Typing Animation */
+        .typing-animation {
+            display: inline-block;
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 3px;
+            background-color: #718096;
+            animation: typing 1.5s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+            margin-right: 0;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Notification styles */
+        .notification {
+            transform: translateY(-100%);
+            transition: transform 0.4s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        .dark .spinner {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary-color);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 25px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(25px);
+        }
+
+        /* Star Rating */
+        .star-rating {
+            display: inline-flex;
+            font-size: 1.5rem;
+            color: #d1d5db;
+        }
+
+        .star-rating > i {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-rating > i.active {
+            color: #fbbf24;
+        }
+
+        .star-rating > i:hover,
+        .star-rating > i:hover ~ i.active {
+            color: #f59e0b;
+        }
+
+        /* Touch animations for mobile */
+        @media (hover: none) {
+            .touch-effect {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .touch-effect:after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 5px;
+                height: 5px;
+                background: rgba(255, 255, 255, 0.5);
+                opacity: 0;
+                border-radius: 100%;
+                transform: scale(1, 1) translate(-50%, -50%);
+                transform-origin: 50% 50%;
+            }
+
+            .touch-effect:active:after {
+                animation: ripple 0.4s ease-out;
+            }
+
+            @keyframes ripple {
+                0% {
+                    transform: scale(0, 0);
+                    opacity: 0.5;
+                }
+                100% {
+                    transform: scale(20, 20);
+                    opacity: 0;
+                }
+            }
+        }
+
+        /* History item hover effect */
+        .history-item {
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Form elements focus states */
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="light min-h-screen flex flex-col">
+    <!-- Notification Area -->
+    <div id="notification" class="notification fixed top-0 left-0 right-0 z-50 p-4 text-white text-center hidden">
+        <div class="max-w-md mx-auto rounded-lg shadow-lg p-4 flex items-center justify-between">
+            <span id="notification-text"></span>
+            <button onclick="hideNotification()" class="ml-4 focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="py-6 px-4 sm:px-6 lg:px-8 border-b transition-all">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-robot text-2xl mr-3 text-blue-500"></i>
+                <h1 class="text-2xl font-bold">Chatbot API Key Tester</h1>
+            </div>
+            <div class="flex items-center mt-4 sm:mt-0">
+                <span class="mr-3 text-sm">
+                    <i class="far fa-sun light-icon"></i>
+                    <i class="far fa-moon dark-icon hidden"></i>
+                </span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- API Key Settings Section -->
+                <div class="lg:col-span-1">
+                    <div class="card rounded-lg shadow-md p-5 border transition-all mb-6">
+                        <h2 class="text-xl font-semibold mb-4">API Settings</h2>
+                        
+                        <div class="mb-4">
+                            <label for="api-key" class="block text-sm font-medium mb-1">API Key</label>
+                            <div class="relative">
+                                <input id="api-key" type="password" class="input-field w-full px-4 py-2 rounded-lg border focus:outline-none" placeholder="Enter your API key" aria-label="API Key">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <button id="toggle-password" class="text-gray-500 hover:text-gray-700 focus:outline-none transition-colors" aria-label="Toggle password visibility">
+                                        <i class="far fa-eye"></i>
+                                    </button>
+                                    <button id="copy-api-key" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors" aria-label="Copy API key">
+                                        <i class="far fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-xs mt-1 text-gray-500 italic">Your API key is not stored or logged. It is only used for testing purposes.</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="endpoint-select" class="block text-sm font-medium mb-1">API Endpoint</label>
+                            <div class="relative">
+                                <select id="endpoint-select" class="form-select input-field w-full px-4 py-2 rounded-lg border focus:outline-none appearance-none" aria-label="API Endpoint">
+                                    <option value="https://api.openai.com/v1/chat/completions">OpenAI API</option>
+                                    <option value="https://api.deepseek.com/v1/chat/completions">Deepseek API</option>
+                                    <option value="https://openrouter.ai/api/v1/chat/completions">OpenRouter API</option>
+                                    <option value="custom">Custom Endpoint</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <input id="custom-endpoint" type="text" class="input-field w-full px-4 py-2 rounded-lg border focus:outline-none mt-2 hidden" placeholder="Enter custom endpoint" aria-label="Custom API Endpoint">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="model-select" class="block text-sm font-medium mb-1">Model</label>
+                            <div class="relative">
+                                <select id="model-select" class="form-select input-field w-full px-4 py-2 rounded-lg border focus:outline-none appearance-none" aria-label="Model Selection">
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                    <option value="deepseek-reasoner">Deepseek Reasoner</option>
+                                    <option value="deepseek/deepseek-r1:free">Deepseek R1 Free</option>
+                                    <option value="gpt-4">GPT-4</option>
+                                    <option value="custom">Custom Model</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <input id="custom-model" type="text" class="input-field w-full px-4 py-2 rounded-lg border focus:outline-none mt-2 hidden" placeholder="Enter custom model" aria-label="Custom Model">
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            <button id="test-api-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-all focus:outline-none flex items-center touch-effect" aria-label="Test API Key">
+                                <i class="fas fa-key mr-2"></i>
+                                <span>Test API Key</span>
+                            </button>
+                            <button id="clear-fields-btn" class="btn bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all focus:outline-none flex items-center touch-effect" aria-label="Clear Fields">
+                                <i class="fas fa-eraser mr-2"></i>
+                                <span>Clear Fields</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test History Section -->
+                    <div class="card rounded-lg shadow-md p-5 border transition-all">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Test History</h2>
+                            <button id="clear-history-btn" class="text-sm text-red-500 hover:text-red-700 focus:outline-none transition-colors" aria-label="Clear History">
+                                <i class="fas fa-trash-alt mr-1"></i> Clear
+                            </button>
+                        </div>
+                        <div id="history-container" class="max-h-80 overflow-y-auto">
+                            <div class="text-center text-gray-500 py-4">
+                                <i class="fas fa-history text-xl mb-2"></i>
+                                <p>No test history yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Interface Section -->
+                <div class="lg:col-span-2">
+                    <div class="card rounded-lg shadow-md border h-full flex flex-col transition-all">
+                        <div class="p-5 border-b flex justify-between items-center">
+                            <h2 class="text-xl font-semibold">Chat Interface</h2>
+                            <div class="flex gap-2">
+                                <button id="download-chat-btn" class="btn text-blue-500 hover:text-blue-700 focus:outline-none transition-colors" aria-label="Download Chat">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button id="clear-chat-btn" class="btn text-red-500 hover:text-red-700 focus:outline-none transition-colors" aria-label="Clear Chat">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="chat-container" class="flex-grow p-5 overflow-y-auto space-y-4">
+                            <div class="text-center text-gray-500 py-10">
+                                <i class="fas fa-comment-dots text-4xl mb-3"></i>
+                                <p class="mb-2">Test your API key to start chatting</p>
+                                <p class="text-sm">Your messages and the AI responses will appear here</p>
+                            </div>
+                        </div>
+                        
+                        <div class="p-5 border-t">
+                            <form id="chat-form" class="flex gap-2">
+                                <input id="message-input" type="text" class="input-field flex-grow px-4 py-2 rounded-lg border focus:outline-none" placeholder="Type a message..." disabled aria-label="Message Input">
+                                <button type="submit" id="send-message-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-all focus:outline-none touch-effect" disabled aria-label="Send Message">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating & Feedback Section -->
+            <div class="card rounded-lg shadow-md p-5 border transition-all mt-6">
+                <h2 class="text-xl font-semibold mb-4">Rate & Provide Feedback</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+                    <div>
+                        <p class="text-sm mb-2">How would you rate this tool?</p>
+                        <div class="star-rating">
+                            <i class="far fa-star" data-rating="1"></i>
+                            <i class="far fa-star" data-rating="2"></i>
+                            <i class="far fa-star" data-rating="3"></i>
+                            <i class="far fa-star" data-rating="4"></i>
+                            <i class="far fa-star" data-rating="5"></i>
+                        </div>
+                        <p id="rating-text" class="text-sm mt-1 text-gray-500">Not rated yet</p>
+                    </div>
+
+                    <div class="flex-grow">
+                        <button id="feedback-btn" class="btn bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg transition-all focus:outline-none flex items-center touch-effect" aria-label="Provide Feedback">
+                            <i class="fas fa-comment-alt mr-2"></i>
+                            <span>Provide Feedback</span>
+                        </button>
+                    </div>
+
+                    <div class="flex">
+                        <button id="share-twitter-btn" class="btn bg-blue-400 hover:bg-blue-500 text-white py-2 px-4 rounded-lg mr-2 transition-all focus:outline-none flex items-center touch-effect" aria-label="Share on Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <button id="share-linkedin-btn" class="btn bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-lg transition-all focus:outline-none flex items-center touch-effect" aria-label="Share on LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How to Use Section -->
+            <div class="card rounded-lg shadow-md p-5 border transition-all mt-6">
+                <h2 class="text-xl font-semibold mb-4">How to Use</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                        <div class="flex items-center mb-2">
+                            <div class="rounded-full bg-blue-500 text-white w-8 h-8 flex items-center justify-center mr-3">1</div>
+                            <h3 class="font-semibold">Enter API Key</h3>
+                        </div>
+                        <p class="text-sm">Input your API key in the field and select your preferred endpoint and model from the dropdown menus.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                        <div class="flex items-center mb-2">
+                            <div class="rounded-full bg-purple-500 text-white w-8 h-8 flex items-center justify-center mr-3">2</div>
+                            <h3 class="font-semibold">Test Connection</h3>
+                        </div>
+                        <p class="text-sm">Click the "Test API Key" button to verify your API key works correctly with the selected endpoint and model.</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+                        <div class="flex items-center mb-2">
+                            <div class="rounded-full bg-green-500 text-white w-8 h-8 flex items-center justify-center mr-3">3</div>
+                            <h3 class="font-semibold">Start Chatting</h3>
+                        </div>
+                        <p class="text-sm">Once validated, the chat interface will be enabled. Type messages and get responses from the AI using your API.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transition-all transform scale-95 opacity-0" id="feedback-modal-content">
+            <div class="p-5 border-b dark:border-gray-700">
+                <h3 class="text-xl font-semibold">Provide Feedback</h3>
+            </div>
+            <div class="p-5">
+                <form id="feedback-form">
+                    <div class="mb-4">
+                        <label for="feedback-name" class="block text-sm font-medium mb-1">Name (Optional)</label>
+                        <input id="feedback-name" type="text" class="input-field w-full px-4 py-2 rounded-lg border focus:outline-none" placeholder="Your name">
+                    </div>
+                    <div class="mb-4">
+                        <label for="feedback-email" class="block text-sm font-medium mb-1">Email (Optional)</label>
+                        <input id="feedback-email" type="email" class="input-field w-full px-4 py-2 rounded-lg border focus:outline-none" placeholder="Your email">
+                    </div>
+                    <div class="mb-4">
+                        <label for="feedback-message" class="block text-sm font-medium mb-1">Feedback</label>
+                        <textarea id="feedback-message" class="input-field w-full px-4 py-2 rounded-lg border focus:outline-none" rows="4" placeholder="Your feedback" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="p-5 border-t dark:border-gray-700 flex justify-end space-x-3">
+                <button id="close-feedback-btn" class="btn py-2 px-4 rounded-lg border focus:outline-none transition-all">Cancel</button>
+                <button id="submit-feedback-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-all focus:outline-none">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-6 px-4 sm:px-6 lg:px-8 border-t transition-all mt-auto">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-500 italic mb-4 md:mb-0">
+                    Developed by Sharof Hasan
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="mailto:sharofhasan8@gmail.com" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-envelope mr-1"></i> Contact Support
+                    </a>
+                    <a href="#" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-shield-alt mr-1"></i> Privacy Policy
+                    </a>
+                    <a href="#" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-gavel mr-1"></i> Terms of Service
+                    </a>
+                </div>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="GitHub">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="Twitter">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Application state
+        const state = {
+            apiKey: "",
+            endpoint: "https://api.openai.com/v1/chat/completions",
+            model: "gpt-3.5-turbo",
+            isApiValidated: false,
+            history: [],
+            chatMessages: [],
+            darkMode: false,
+            rating: 0,
+            isTyping: false
+        };
+
+        // DOM Elements
+        const elements = {
+            apiKeyInput: document.getElementById('api-key'),
+            togglePasswordBtn: document.getElementById('toggle-password'),
+            copyApiKeyBtn: document.getElementById('copy-api-key'),
+            endpointSelect: document.getElementById('endpoint-select'),
+            customEndpointInput: document.getElementById('custom-endpoint'),
+            modelSelect: document.getElementById('model-select'),
+            customModelInput: document.getElementById('custom-model'),
+            testApiBtn: document.getElementById('test-api-btn'),
+            clearFieldsBtn: document.getElementById('clear-fields-btn'),
+            clearHistoryBtn: document.getElementById('clear-history-btn'),
+            historyContainer: document.getElementById('history-container'),
+            chatContainer: document.getElementById('chat-container'),
+            messageInput: document.getElementById('message-input'),
+            sendMessageBtn: document.getElementById('send-message-btn'),
+            chatForm: document.getElementById('chat-form'),
+            downloadChatBtn: document.getElementById('download-chat-btn'),
+            clearChatBtn: document.getElementById('clear-chat-btn'),
+            notification: document.getElementById('notification'),
+            notificationText: document.getElementById('notification-text'),
+            themeToggle: document.getElementById('theme-toggle'),
+            feedbackBtn: document.getElementById('feedback-btn'),
+            feedbackModal: document.getElementById('feedback-modal'),
+            feedbackModalContent: document.getElementById('feedback-modal-content'),
+            closeFeedbackBtn: document.getElementById('close-feedback-btn'),
+            submitFeedbackBtn: document.getElementById('submit-feedback-btn'),
+            feedbackForm: document.getElementById('feedback-form'),
+            feedbackName: document.getElementById('feedback-name'),
+            feedbackEmail: document.getElementById('feedback-email'),
+            feedbackMessage: document.getElementById('feedback-message'),
+            shareTwitterBtn: document.getElementById('share-twitter-btn'),
+            shareLinkedInBtn: document.getElementById('share-linkedin-btn'),
+            starRating: document.querySelectorAll('.star-rating i'),
+            ratingText: document.getElementById('rating-text')
+        };
+
+        // Initialize the application
+        function init() {
+            setupEventListeners();
+            loadFromLocalStorage();
+            updateUI();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Theme toggle
+            elements.themeToggle.addEventListener('change', toggleDarkMode);
+            
+            // API key visibility toggle
+            elements.togglePasswordBtn.addEventListener('click', togglePasswordVisibility);
+            
+            // Copy API key
+            elements.copyApiKeyBtn.addEventListener('click', copyApiKey);
+            
+            // Custom endpoint handling
+            elements.endpointSelect.addEventListener('change', handleEndpointChange);
+            elements.customEndpointInput.addEventListener('input', updateEndpoint);
+            
+            // Custom model handling
+            elements.modelSelect.addEventListener('change', handleModelChange);
+            elements.customModelInput.addEventListener('input', updateModel);
+            
+            // API testing
+            elements.testApiBtn.addEventListener('click', testApiConnection);
+            
+            // Clear buttons
+            elements.clearFieldsBtn.addEventListener('click', clearFields);
+            elements.clearHistoryBtn.addEventListener('click', clearHistory);
+            elements.clearChatBtn.addEventListener('click', clearChat);
+            
+            // Chat functionality
+            elements.chatForm.addEventListener('submit', handleSendMessage);
+            elements.downloadChatBtn.addEventListener('click', downloadChat);
+            
+            // Feedback modal
+            elements.feedbackBtn.addEventListener('click', openFeedbackModal);
+            elements.closeFeedbackBtn.addEventListener('click', closeFeedbackModal);
+            elements.submitFeedbackBtn.addEventListener('click', submitFeedback);
+            
+            // Share buttons
+            elements.shareTwitterBtn.addEventListener('click', shareOnTwitter);
+            elements.shareLinkedInBtn.addEventListener('click', shareOnLinkedIn);
+            
+            // Star rating
+            elements.starRating.forEach(star => {
+                star.addEventListener('click', handleRating);
+                star.addEventListener('mouseover', handleRatingHover);
+                star.addEventListener('mouseout', handleRatingOut);
+            });
+            
+            // Modal click outside to close
+            elements.feedbackModal.addEventListener('click', (e) => {
+                if (e.target === elements.feedbackModal) {
+                    closeFeedbackModal();
+                }
+            });
+            
+            // Keyboard accessibility
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !elements.feedbackModal.classList.contains('hidden')) {
+                    closeFeedbackModal();
+                }
+            });
+        }
+
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            try {
+                // Load theme preference
+                const savedTheme = localStorage.getItem('darkMode');
+                if (savedTheme === 'true') {
+                    state.darkMode = true;
+                    elements.themeToggle.checked = true;
+                    document.body.classList.remove('light');
+                    document.body.classList.add('dark');
+                    document.querySelector('.light-icon').classList.add('hidden');
+                    document.querySelector('.dark-icon').classList.remove('hidden');
+                }
+                
+                // Load history
+                const savedHistory = localStorage.getItem('apiTestHistory');
+                if (savedHistory) {
+                    state.history = JSON.parse(savedHistory);
+                    renderHistory();
+                }
+                
+                // Load chat messages
+                const savedChat = localStorage.getItem('chatMessages');
+                if (savedChat) {
+                    state.chatMessages = JSON.parse(savedChat);
+                    renderChat();
+                }
+                
+                // Load rating
+                const savedRating = localStorage.getItem('toolRating');
+                if (savedRating) {
+                    state.rating = parseInt(savedRating);
+                    updateRatingUI();
+                }
+            } catch (error) {
+                console.error('Error loading from localStorage:', error);
+                showNotification('Error loading saved data', 'error');
+            }
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            state.darkMode = elements.themeToggle.checked;
+            
+            if (state.darkMode) {
+                document.body.classList.remove('light');
+                document.body.classList.add('dark');
+                document.querySelector('.light-icon').classList.add('hidden');
+                document.querySelector('.dark-icon').classList.remove('hidden');
+            } else {
+                document.body.classList.remove('dark');
+                document.body.classList.add('light');
+                document.querySelector('.light-icon').classList.remove('hidden');
+                document.querySelector('.dark-icon').classList.add('hidden');
+            }
+            
+            localStorage.setItem('darkMode', state.darkMode);
+        }
+
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const isPassword = elements.apiKeyInput.type === 'password';
+            elements.apiKeyInput.type = isPassword ? 'text' : 'password';
+            elements.togglePasswordBtn.innerHTML = isPassword ? 
+                '<i class="far fa-eye-slash"></i>' : 
+                '<i class="far fa-eye"></i>';
+        }
+
+        // Copy API key to clipboard
+        function copyApiKey() {
+            const apiKey = elements.apiKeyInput.value.trim();
+            if (!apiKey) {
+                showNotification('No API key to copy', 'warning');
+                return;
+            }
+            
+            navigator.clipboard.writeText(apiKey)
+                .then(() => {
+                    showNotification('API key copied to clipboard', 'success');
+                })
+                .catch(() => {
+                    showNotification('Failed to copy API key', 'error');
+                });
+        }
+
+        // Handle endpoint selection change
+        function handleEndpointChange() {
+            const selectedEndpoint = elements.endpointSelect.value;
+            if (selectedEndpoint === 'custom') {
+                elements.customEndpointInput.classList.remove('hidden');
+                elements.customEndpointInput.focus();
+                state.endpoint = elements.customEndpointInput.value;
+            } else {
+                elements.customEndpointInput.classList.add('hidden');
+                state.endpoint = selectedEndpoint;
+            }
+        }
+
+        // Update endpoint from custom input
+        function updateEndpoint() {
+            state.endpoint = elements.customEndpointInput.value;
+        }
+
+        // Handle model selection change
+        function handleModelChange() {
+            const selectedModel = elements.modelSelect.value;
+            if (selectedModel === 'custom') {
+                elements.customModelInput.classList.remove('hidden');
+                elements.customModelInput.focus();
+                state.model = elements.customModelInput.value;
+            } else {
+                elements.customModelInput.classList.add('hidden');
+                state.model = selectedModel;
+            }
+        }
+
+        // Update model from custom input
+        function updateModel() {
+            state.model = elements.customModelInput.value;
+        }
+
+        // Test API connection
+        function testApiConnection() {
+            state.apiKey = elements.apiKeyInput.value.trim();
+            if (!state.apiKey) {
+                showNotification('Please enter an API key', 'warning');
+                return;
+            }
+            
+            // Show loading state
+            elements.testApiBtn.disabled = true;
+            elements.testApiBtn.innerHTML = `
+                <div class="spinner mr-2"></div>
+                <span>Testing...</span>
+            `;
+            
+            // Create test payload
+            const testPayload = {
+                model: state.model,
+                messages: [
+                    { role: "system", content: "You are a helpful assistant." },
+                    { role: "user", content: "Hello, please respond with 'API key is working!' to verify the connection." }
+                ]
+            };
+            
+            // Make API request
+            fetch(state.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.apiKey}`
+                },
+                body: JSON.stringify(testPayload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // API key is valid
+                state.isApiValidated = true;
+                
+                // Add to history
+                addToHistory({
+                    timestamp: new Date().toISOString(),
+                    apiKey: maskApiKey(state.apiKey),
+                    endpoint: state.endpoint,
+                    model: state.model,
+                    status: 'success'
+                });
+                
+                // Update UI
+                elements.messageInput.disabled = false;
+                elements.sendMessageBtn.disabled = false;
+                
+                showNotification('API key validated successfully!', 'success');
+                
+                // Clear chat and add system message
+                state.chatMessages = [];
+                addMessageToChat('system', 'API connection established. You can now chat with the AI.');
+                
+                // Enable chat interface
+                updateChatUI();
+            })
+            .catch(error => {
+                console.error('API validation error:', error);
+                
+                // Add to history
+                addToHistory({
+                    timestamp: new Date().toISOString(),
+                    apiKey: maskApiKey(state.apiKey),
+                    endpoint: state.endpoint,
+                    model: state.model,
+                    status: 'error',
+                    error: error.message
+                });
+                
+                showNotification(`Failed to validate API key: ${error.message}`, 'error');
+                state.isApiValidated = false;
+            })
+            .finally(() => {
+                // Reset button state
+                elements.testApiBtn.disabled = false;
+                elements.testApiBtn.innerHTML = `
+                    <i class="fas fa-key mr-2"></i>
+                    <span>Test API Key</span>
+                `;
+            });
+        }
+
+        // Add entry to history
+        function addToHistory(entry) {
+            state.history.unshift(entry);
+            if (state.history.length > 10) {
+                state.history.pop();
+            }
+            
+            localStorage.setItem('apiTestHistory', JSON.stringify(state.history));
+            renderHistory();
+        }
+
+        // Render history
+        function renderHistory() {
+            if (state.history.length === 0) {
+                elements.historyContainer.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-history text-xl mb-2"></i>
+                        <p>No test history yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            elements.historyContainer.innerHTML = '';
+            
+            state.history.forEach((entry, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item p-3 mb-2 rounded-lg border transition-all';
+                historyItem.style.borderColor = entry.status === 'success' ? 'var(--success-color)' : 'var(--danger-color)';
+                historyItem.style.borderWidth = '1px';
+                historyItem.style.borderStyle = 'solid';
+                
+                const date = new Date(entry.timestamp);
+                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                
+                historyItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center">
+                                <span class="text-xs font-medium ${entry.status === 'success' ? 'text-green-500' : 'text-red-500'}">
+                                    <i class="fas ${entry.status === 'success' ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i>
+                                    ${entry.status === 'success' ? 'Success' : 'Failed'}
+                                </span>
+                                <span class="text-xs text-gray-500 ml-2">${formattedDate}</span>
+                            </div>
+                            <p class="text-sm mt-1 font-mono">${entry.apiKey}</p>
+                            <p class="text-xs mt-1 text-gray-500 truncate" title="${entry.endpoint}">
+                                <span class="font-semibold">Endpoint:</span> ${shortenUrl(entry.endpoint)}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                <span class="font-semibold">Model:</span> ${entry.model}
+                            </p>
+                            ${entry.error ? `<p class="text-xs text-red-500 mt-1">${entry.error}</p>` : ''}
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600 focus:outline-none" onclick="removeHistoryItem(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                elements.historyContainer.appendChild(historyItem);
+            });
+        }
+
+        // Remove history item
+        function removeHistoryItem(index) {
+            state.history.splice(index, 1);
+            localStorage.setItem('apiTestHistory', JSON.stringify(state.history));
+            renderHistory();
+        }
+
+        // Clear all history
+        function clearHistory() {
+            state.history = [];
+            localStorage.setItem('apiTestHistory', JSON.stringify(state.history));
+            renderHistory();
+            showNotification('History cleared', 'info');
+        }
+
+        // Clear input fields
+        function clearFields() {
+            elements.apiKeyInput.value = '';
+            elements.endpointSelect.value = 'https://api.openai.com/v1/chat/completions';
+            elements.customEndpointInput.classList.add('hidden');
+            elements.modelSelect.value = 'gpt-3.5-turbo';
+            elements.customModelInput.classList.add('hidden');
+            
+            state.apiKey = '';
+            state.endpoint = 'https://api.openai.com/v1/chat/completions';
+            state.model = 'gpt-3.5-turbo';
+            
+            showNotification('Fields cleared', 'info');
+        }
+
+        // Handle sending a message
+        function handleSendMessage(e) {
+            e.preventDefault();
+            
+            if (!state.isApiValidated) {
+                showNotification('Please validate your API key first', 'warning');
+                return;
+            }
+            
+            const message = elements.messageInput.value.trim();
+            if (!message) {
+                return;
+            }
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            
+            // Clear input
+            elements.messageInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Disable send button while processing
+            elements.sendMessageBtn.disabled = true;
+            
+            // Prepare messages for API
+            const apiMessages = state.chatMessages
+                .filter(msg => msg.role !== 'system' || msg.role !== 'typing')
+                .map(msg => ({ role: msg.role, content: msg.content }));
+            
+            // Add system message if not present
+            if (!apiMessages.some(msg => msg.role === 'system')) {
+                apiMessages.unshift({ role: 'system', content: 'You are a helpful assistant.' });
+            }
+            
+            // Make API request
+            fetch(state.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: state.model,
+                    messages: apiMessages
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Remove typing indicator
+                removeTypingIndicator();
+                
+                // Add AI response to chat
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    const aiMessage = data.choices[0].message.content;
+                    addMessageToChat('assistant', aiMessage);
+                } else {
+                    throw new Error('Invalid response format from API');
+                }
+            })
+            .catch(error => {
+                console.error('Chat API error:', error);
+                removeTypingIndicator();
+                addMessageToChat('system', `Error: ${error.message}`);
+                showNotification(`API error: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                elements.sendMessageBtn.disabled = false;
+            });
+        }
+
+        // Add a message to the chat
+        function addMessageToChat(role, content) {
+            // Add to state
+            if (role !== 'typing') {
+                state.chatMessages.push({ role, content });
+                localStorage.setItem('chatMessages', JSON.stringify(state.chatMessages));
+            }
+            
+            // Render chat
+            renderChat();
+            
+            // Scroll to bottom
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            state.isTyping = true;
+            
+            // Create typing indicator element
+            const typingElement = document.createElement('div');
+            typingElement.className = 'chat-bubble-ai typing-indicator p-3 max-w-xs animate-fade-in';
+            typingElement.id = 'typing-indicator';
+            typingElement.innerHTML = `
+                <div class="typing-animation">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+            `;
+            
+            // Add to chat container
+            elements.chatContainer.appendChild(typingElement);
+            
+            // Scroll to bottom
+            elements.chatContainer.scrollTop = elements.chatContainer.scrollHeight;
+        }
+
+        // Remove typing indicator
+        function removeTypingIndicator() {
+            state.isTyping = false;
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Render chat messages
+        function renderChat() {
+            if (state.chatMessages.length === 0) {
+                elements.chatContainer.innerHTML = `
+                    <div class="text-center text-gray-500 py-10">
+                        <i class="fas fa-comment-dots text-4xl mb-3"></i>
+                        <p class="mb-2">Test your API key to start chatting</p>
+                        <p class="text-sm">Your messages and the AI responses will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            elements.chatContainer.innerHTML = '';
+            
+            state.chatMessages.forEach(message => {
+                const messageElement = document.createElement('div');
+                
+                switch (message.role) {
+                    case 'user':
+                        messageElement.className = 'flex justify-end mb-4';
+                        messageElement.innerHTML = `
+                            <div class="chat-bubble-user p-3 rounded-lg max-w-xs md:max-w-md lg:max-w-lg">
+                                <p>${formatMessageContent(message.content)}</p>
+                                <div class="text-xs text-right mt-1 opacity-70">You</div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'assistant':
+                        messageElement.className = 'flex justify-start mb-4';
+                        messageElement.innerHTML = `
+                            <div class="chat-bubble-ai p-3 rounded-lg max-w-xs md:max-w-md lg:max-w-lg">
+                                <p>${formatMessageContent(message.content)}</p>
+                                <div class="text-xs text-left mt-1 opacity-70">AI</div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'system':
+                        messageElement.className = 'flex justify-center my-4';
+                        messageElement.innerHTML = `
+                            <div class="text-sm text-center text-gray-500 bg-gray-100 dark:bg-gray-700 py-2 px-4 rounded-full">
+                                <i class="fas fa-info-circle mr-1"></i> ${message.content}
+                            </div>
+                        `;
+                        break;
+                }
+                
+                elements.chatContainer.appendChild(messageElement);
+            });
+            
+            // Add typing indicator if needed
+            if (state.isTyping) {
+                showTypingIndicator();
+            }
+        }
+
+        // Format message content (handle markdown-like syntax)
+        function formatMessageContent(content) {
+            if (!content) return '';
+            
+            // Replace new lines with <br>
+            let formatted = content.replace(/\n/g, '<br>');
+            
+            // Code formatting
+            formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm font-mono">$1</code>');
+            
+            // Bold formatting
+            formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // Italic formatting
+            formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            
+            return formatted;
+        }
+
+        // Download chat history
+        function downloadChat() {
+            if (state.chatMessages.length === 0) {
+                showNotification('No chat messages to download', 'warning');
+                return;
+            }
+            
+            let chatText = 'Chatbot API Key Test - Chat History\n';
+            chatText += '======================================\n\n';
+            chatText += `Generated on: ${new Date().toLocaleString()}\n`;
+            chatText += `API Endpoint: ${state.endpoint}\n`;
+            chatText += `Model: ${state.model}\n\n`;
+            chatText += '======================================\n\n';
+            
+            state.chatMessages.forEach(message => {
+                switch (message.role) {
+                    case 'user':
+                        chatText += `You: ${message.content}\n\n`;
+                        break;
+                    case 'assistant':
+                        chatText += `AI: ${message.content}\n\n`;
+                        break;
+                    case 'system':
+                        chatText += `System: ${message.content}\n\n`;
+                        break;
+                }
+            });
+            
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-history-${new Date().toISOString().slice(0, 10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Chat history downloaded', 'success');
+        }
+
+        // Clear chat
+        function clearChat() {
+            state.chatMessages = [];
+            localStorage.setItem('chatMessages', JSON.stringify(state.chatMessages));
+            renderChat();
+            showNotification('Chat cleared', 'info');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            elements.notificationText.textContent = message;
+            
+            // Set background color based on type
+            const notificationDiv = elements.notification.querySelector('div');
+            notificationDiv.className = notificationDiv.className.replace(/bg-\w+-\d+/g, '');
+            
+            switch (type) {
+                case 'success':
+                    notificationDiv.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notificationDiv.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    notificationDiv.classList.add('bg-yellow-500');
+                    break;
+                default:
+                    notificationDiv.classList.add('bg-blue-500');
+            }
+            
+            // Show notification
+            elements.notification.classList.remove('hidden');
+            elements.notification.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(hideNotification, 5000);
+        }
+
+        // Hide notification
+        function hideNotification() {
+            elements.notification.classList.remove('show');
+            setTimeout(() => {
+                elements.notification.classList.add('hidden');
+            }, 400);
+        }
+
+        // Open feedback modal
+        function openFeedbackModal() {
+            elements.feedbackModal.classList.remove('hidden');
+            setTimeout(() => {
+                elements.feedbackModalContent.classList.remove('scale-95', 'opacity-0');
+                elements.feedbackModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            elements.feedbackMessage.focus();
+        }
+
+        // Close feedback modal
+        function closeFeedbackModal() {
+            elements.feedbackModalContent.classList.remove('scale-100', 'opacity-100');
+            elements.feedbackModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                elements.feedbackModal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Submit feedback
+        function submitFeedback() {
+            const name = elements.feedbackName.value.trim();
+            const email = elements.feedbackEmail.value.trim();
+            const message = elements.feedbackMessage.value.trim();
+            
+            if (!message) {
+                showNotification('Please enter your feedback message', 'warning');
+                return;
+            }
+            
+            // In a real implementation, this would send the feedback to a server
+            // For this demo, we'll just simulate a successful submission
+            
+            showNotification('Thank you for your feedback!', 'success');
+            closeFeedbackModal();
+            
+            // Clear form
+            elements.feedbackName.value = '';
+            elements.feedbackEmail.value = '';
+            elements.feedbackMessage.value = '';
+        }
+
+        // Share on Twitter
+        function shareOnTwitter() {
+            const text = 'Check out this Chatbot API Key Tester! Easily test your API keys here:';
+            const url = window.location.href;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        // Share on LinkedIn
+        function shareOnLinkedIn() {
+            const url = window.location.href;
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        // Handle star rating click
+        function handleRating(e) {
+            const rating = parseInt(e.target.dataset.rating);
+            state.rating = rating;
+            localStorage.setItem('toolRating', rating);
+            updateRatingUI();
+            showNotification(`Thank you for rating ${rating} stars!`, 'success');
+        }
+
+        // Handle star rating hover
+        function handleRatingHover(e) {
+            const rating = parseInt(e.target.dataset.rating);
+            updateRatingUI(rating, true);
+        }
+
+        // Handle star rating mouse out
+        function handleRatingOut() {
+            updateRatingUI();
+        }
+
+        // Update rating UI
+        function updateRatingUI(hoverRating = null, isHover = false) {
+            const displayRating = hoverRating !== null ? hoverRating : state.rating;
+            
+            elements.starRating.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                
+                // Reset all classes first
+                star.className = star.className.replace(/fa[rs] fa-star(-half-alt)?/g, 'far fa-star');
+                
+                if (starRating <= displayRating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas', 'active');
+                } else {
+                    star.classList.remove('fas', 'active');
+                    star.classList.add('far');
+                }
+            });
+            
+            // Update rating text
+            if (displayRating > 0) {
+                const ratingMessages = [
+                    '',
+                    'Poor',
+                    'Fair',
+                    'Good',
+                    'Very Good',
+                    'Excellent'
+                ];
+                elements.ratingText.textContent = isHover ? ratingMessages[displayRating] : `You rated: ${ratingMessages[displayRating]} (${displayRating}/5)`;
+            } else {
+                elements.ratingText.textContent = 'Not rated yet';
+            }
+        }
+
+        // Helper function to mask API key for display
+        function maskApiKey(key) {
+            if (!key) return '';
+            
+            // For keys like "sk-xxxxxxxxxxx"
+            if (key.startsWith('sk-')) {
+                const firstPart = key.substring(0, 5);
+                const lastPart = key.substring(key.length - 4);
+                return `${firstPart}...${lastPart}`;
+            }
+            
+            // For other format keys
+            if (key.length > 10) {
+                const firstPart = key.substring(0, 4);
+                const lastPart = key.substring(key.length - 4);
+                return `${firstPart}...${lastPart}`;
+            }
+            
+            return key;
+        }
+
+        // Helper function to shorten URLs for display
+        function shortenUrl(url) {
+            if (!url) return '';
+            
+            try {
+                const urlObj = new URL(url);
+                return `${urlObj.hostname}${urlObj.pathname}`;
+            } catch (e) {
+                return url;
+            }
+        }
+
+        // Update UI based on current state
+        function updateUI() {
+            if (state.isApiValidated) {
+                elements.messageInput.disabled = false;
+                elements.sendMessageBtn.disabled = false;
+            } else {
+                elements.messageInput.disabled = true;
+                elements.sendMessageBtn.disabled = true;
+            }
+        }
+
+        // Update chat UI
+        function updateChatUI() {
+            if (state.isApiValidated) {
+                const welcomeMessage = 'Chat interface is now enabled. You can start sending messages to test your API key.';
+                elements.chatContainer.innerHTML = `
+                    <div class="flex justify-center my-4">
+                        <div class="text-sm text-center text-gray-500 bg-gray-100 dark:bg-gray-700 py-2 px-4 rounded-full">
+                            <i class="fas fa-info-circle mr-1"></i> ${welcomeMessage}
+                        </div>
+                    </div>
+                `;
+                elements.messageInput.disabled = false;
+                elements.sendMessageBtn.disabled = false;
+                elements.messageInput.focus();
+            }
+        }
+
+        // Make the removeHistoryItem function globally accessible
+        window.removeHistoryItem = removeHistoryItem;
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
